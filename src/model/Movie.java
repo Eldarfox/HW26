@@ -21,9 +21,12 @@ public class Movie {
         return director;
     }
 
+    public List<Actor> getCast() {
+        return cast;
+    }
+
     @Override
     public String toString() {
         return name + " (" + year + "), director: " + director.getFullName();
     }
 }
-
