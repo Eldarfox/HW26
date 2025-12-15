@@ -1,0 +1,15 @@
+git init
+git add .
+git commit -m "Initial commit"
+git add .
+git commit -m "Initial commit"
+git add .
+git commit -m "create model packege there are Actor Director Movie"
+git add .
+git commit -m "add Jsonloader , MovieService"
+git add .
+git commit -m "task 2 complated, expand opportunity MovieService"
+git add .
+git commit -m "add normal menu in main"
+git add .
+git commit -m "ive done bonus task , add more function for menu"
