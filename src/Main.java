@@ -6,22 +6,24 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
 
-        List<Movie> movies = JsonLoader.loadMovies();
-        MovieService service = new MovieService(movies);
         Scanner sc = new Scanner(System.in);
+        List<Movie> movies = null;
+        MovieService service = null;
 
         boolean run = true;
 
         while (run) {
-            System.out.println("\n===== MENU =====");
-            System.out.println("1 - Show all movies");
-            System.out.println("2 - Sort movies");
-            System.out.println("3 - Movies by actor");
-            System.out.println("4 - Movies by director");
-            System.out.println("5 - Movies by year");
-            System.out.println("6 - Actors and roles");
+            System.out.println("=========== MOVIE APPLICATION ===========");
+            System.out.println("1 - Load movies from file");
+            System.out.println("2 - Show all movies");
+            System.out.println("3 - Search movie by name");
+            System.out.println("4 - Sort movies");
+            System.out.println("5 - Movies by actor");
+            System.out.println("6 - Movies by director");
+            System.out.println("7 - Movies by year");
+            System.out.println("8 - Actors and their roles");
             System.out.println("0 - Exit");
-            System.out.print("Choose: ");
+            System.out.print("Choose option: ");
 
             int choice = sc.nextInt();
             sc.nextLine();
@@ -29,49 +31,73 @@ public class Main {
             switch (choice) {
 
                 case 1:
-                    for (Movie m : movies) {
-                        System.out.println(m);
-                    }
+                    movies = JsonLoader.loadMovies();
+                    service = new MovieService(movies);
+                    System.out.println("Movies loaded successfully!");
                     break;
 
                 case 2:
-                    sortMenu(sc, service);
+                    if (checkLoaded(service)) {
+                        printMovies(movies);
+                    }
                     break;
 
                 case 3:
-                    Map<String, List<Movie>> byActor = service.getMoviesByActor();
-                    for (String actor : byActor.keySet()) {
-                        System.out.println(actor + ":");
-                        for (Movie m : byActor.get(actor)) {
-                            System.out.println("  " + m.getName());
-                        }
+                    if (checkLoaded(service)) {
+                        System.out.print("Enter movie name: ");
+                        String query = sc.nextLine();
+                        printMovies(service.searchByName(query));
                     }
                     break;
 
                 case 4:
-                    Map<String, List<Movie>> byDirector = service.getMoviesByDirector();
-                    for (String director : byDirector.keySet()) {
-                        System.out.println(director + ":");
-                        for (Movie m : byDirector.get(director)) {
-                            System.out.println("  " + m.getName());
-                        }
+                    if (checkLoaded(service)) {
+                        sortMenu(sc, service);
                     }
                     break;
 
                 case 5:
-                    Map<Integer, List<Movie>> byYear = service.getMoviesByYear();
-                    for (Integer year : byYear.keySet()) {
-                        System.out.println(year + ":");
-                        for (Movie m : byYear.get(year)) {
-                            System.out.println("  " + m.getName());
+                    if (checkLoaded(service)) {
+                        Map<String, List<Movie>> byActor = service.getMoviesByActor();
+                        for (String actor : byActor.keySet()) {
+                            System.out.println("\n" + actor + ":");
+                            for (Movie m : byActor.get(actor)) {
+                                System.out.println("  - " + m.getName());
+                            }
                         }
                     }
                     break;
 
                 case 6:
-                    Map<String, List<String>> actors = service.getAllActorsSorted();
-                    for (String actor : actors.keySet()) {
-                        System.out.println(actor + " -> " + actors.get(actor));
+                    if (checkLoaded(service)) {
+                        Map<String, List<Movie>> byDirector = service.getMoviesByDirector();
+                        for (String director : byDirector.keySet()) {
+                            System.out.println("\n" + director + ":");
+                            for (Movie m : byDirector.get(director)) {
+                                System.out.println("  - " + m.getName());
+                            }
+                        }
+                    }
+                    break;
+
+                case 7:
+                    if (checkLoaded(service)) {
+                        Map<Integer, List<Movie>> byYear = service.getMoviesByYear();
+                        for (Integer year : byYear.keySet()) {
+                            System.out.println("\n" + year + ":");
+                            for (Movie m : byYear.get(year)) {
+                                System.out.println("  - " + m.getName());
+                            }
+                        }
+                    }
+                    break;
+
+                case 8:
+                    if (checkLoaded(service)) {
+                        Map<String, List<String>> actors = service.getAllActorsSorted();
+                        for (String actor : actors.keySet()) {
+                            System.out.println(actor + " -> " + actors.get(actor));
+                        }
                     }
                     break;
 
@@ -80,14 +106,22 @@ public class Main {
                     break;
 
                 default:
-                    System.out.println("Wrong choice");
+                    System.out.println("Wrong option. Try again.");
             }
         }
     }
 
+    private static boolean checkLoaded(MovieService service) {
+        if (service == null) {
+            System.out.println("Please load movies first!");
+            return false;
+        }
+        return true;
+    }
+
     private static void sortMenu(Scanner sc, MovieService service) {
 
-        System.out.println("Sort by:");
+        System.out.println("\nSort by:");
         System.out.println("1 - Year");
         System.out.println("2 - Name");
         System.out.println("3 - Director");
@@ -117,7 +151,16 @@ public class Main {
             return;
         }
 
-        for (Movie m : result) {
+        printMovies(result);
+    }
+
+    private static void printMovies(List<Movie> movies) {
+        if (movies.isEmpty()) {
+            System.out.println("No movies found.");
+            return;
+        }
+
+        for (Movie m : movies) {
             System.out.println(m);
         }
     }
